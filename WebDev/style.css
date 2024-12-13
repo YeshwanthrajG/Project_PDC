@@ -1,0 +1,112 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap'); */
+
+/* .material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+} */
+
+.material-symbols-outlined {
+    color: white;
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+  
+}
+
+*
+{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: "Noto Sans", sans-serif;
+    /* This is universal declaration for all tags in the stylesheet(html document) */
+}  
+
+body
+{
+    background: url("assets/BG/background.jpg");  /* background image with path link */
+    /* These are the properties of background image */
+    width: 100%;
+    height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+body::before
+{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100dvh;
+    background: rgb(0,0,0,0.15);
+    backdrop-filter: blur(15px);
+}
+
+.homeframe
+{
+    border: solid;
+    width: 300px;
+    height: 496px;
+    z-index: 1; /*Responsible for the white rectangular border lines */
+    background: linear-gradient
+    (
+        to top, rgb(0,0,0,0.15),
+        rgb(255,255,255,0.15)
+    );  /* Responsible for linear gradient of greyish white color inside rectangular box */
+    border-radius: 12px;
+    backdrop-filter: blur(100px);
+    padding: 20px;
+}
+
+/* INPUT VALUES OF CITYFRAME */
+.inputframe
+{
+    position: relative;
+}
+
+.cityframe
+{
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 99px;
+    border: 3px solid transparent;
+    background: rgb(0,0,0,0.15);
+    outline: none;
+    font-weight: 500;
+    transition: 0.25s border;
+    padding-right: 45px;
+    /* display: inline-block; */
+}
+
+.cityframe:focus
+{
+    border: 3px solid rgb(0,0,0,0.15);
+}
+
+.cityframe::placeholder
+{
+    color: rgb(255,255,255,0.75);
+}
+
+
+.searchframe
+{
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    display: flex;
+    border: none;
+    cursor: pointer;
+}
+/* END OF INPUT VALUES */
