@@ -49,10 +49,10 @@ async function updateWeatherInfo(city) {
     }
     
     const {
-        name : country,
-        main : { temp, humidity },
-        weather : [{ id, main }],
-        wind : { speed },
+        name: country,
+        main: { temp, humidity },
+        weather: [{ id, main }],
+        wind: { speed },
     } = weatherData;
     
     locationFrame.textContent = country;
@@ -65,9 +65,29 @@ async function updateWeatherInfo(city) {
     
     weatherSummaryImg.src = `assets/weather/${getWeatherIcon(id)}`;
 
+    // Get disease prediction
+    const risk = await getDiseasePrediction(Math.round(temp), humidity);
+    if (risk === 1) {
+        alert("Alert: Rice blast is likely to occur. Take preventive measures!");
+    } else {
+        alert("Rice blast is not likely to occur. Conditions are safe.");
+    }
+
     await updateForeCastInfo(city);
 
     displaySection(weatherInfoSection);
+}
+
+async function getDiseasePrediction(temperature, humidity) {
+    const url = `http://localhost:8000/predict?temperature=${temperature}&humidity=${humidity}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.rice_blast[0][0]; // Ensure this exists in API response
+    } catch (error) {
+        console.error("Error fetching disease prediction:", error);
+        return undefined;
+    }
 }
 
 async function updateForeCastInfo(city) {
