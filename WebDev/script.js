@@ -79,7 +79,8 @@ async function updateWeatherInfo(city) {
 }
 
 async function getDiseasePrediction(temperature, humidity) {
-    const url = `http://localhost:8000/predict?temperature=${temperature}&humidity=${humidity}`;
+    const url = `https://appsail-50024113720.development.catalystappsail.in/predict?temperature=${temperature}&humidity=${humidity}`;
+
     try {
         const response = await fetch(url);
         const data = await response.json();
