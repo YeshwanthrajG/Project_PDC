@@ -84,6 +84,7 @@ async function getDiseasePrediction(temperature, humidity) {
     try {
         const response = await fetch(url);
         const data = await response.json();
+        console.log(data);
         return data.rice_blast[0][0]; // Ensure this exists in API response
     } catch (error) {
         console.error("Error fetching disease prediction:", error);
