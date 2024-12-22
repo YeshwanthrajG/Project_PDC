@@ -66,7 +66,6 @@ async function updateWeatherInfo(city) {
     weatherSummaryImg.src = `assets/weather/${getWeatherIcon(id)}`;
 
     // Get disease prediction
-    //const risk = await getDiseasePrediction(30,95);
     const risk = await getDiseasePrediction(Math.round(temp), humidity);
     if (risk === 1) {
         alert("Alert: Rice blast is likely to occur. Take preventive measures!");
@@ -80,41 +79,23 @@ async function updateWeatherInfo(city) {
 }
 
 async function getDiseasePrediction(temperature, humidity) {
-    const url = `https://appsail-50024113720.development.catalystappsail.in/predict?temperature=${temperature}&humidity=${humidity}`;
-
+    // Temporary url
+    const url = `https://5c8e-2409-408d-4e80-534c-20d0-7b6e-9d38-771c.ngrok-free.app/predict?temperature=${temperature}&humidity=${humidity}`;
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log(data);
-        return data.rice_blast[0][0]; // Ensure this exists in API response
+        const response = await fetch(url, {
+            method: 'GET',  // Ensure the method is GET
+            headers: { 
+                "Content-Type": "application/json", 
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
+        const text = await response.text();
+        return parseInt(text[16]); // Ensure this exists in API response
     } catch (error) {
         console.error("Error fetching disease prediction:", error);
         return undefined;
     }
-} 
-
-// async function getDiseasePrediction(temperature, humidity) {
-//     try {
-//         const response = await fetch(`https://appsail-50024113720.development.catalystappsail.in/predict?temperature=${temperature}&humidity=${humidity}`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             }
-//         });
-
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-
-//         const data = await response.json();
-//         console.log('Prediction:', data);
-//         return data;
-//     } catch (error) {
-//         console.error('Error fetching disease prediction:', error);
-//         throw error;
-//     }
-// }
-
+}
 
 async function updateForeCastInfo(city) {
     const forcastData = await fetchData("forecast", city);
