@@ -80,7 +80,7 @@ async function updateWeatherInfo(city) {
 }
 
 async function getDiseasePrediction(temperature, humidity) {
-    const url = `https://43a5-2409-40f4-3011-672a-7d2c-67ff-31b7-9792.ngrok-free.app/predict?temperature=${temperature}&humidity=${humidity}`;
+    const url = `https://appsail-50024113720.development.catalystappsail.in/predict?temperature=${temperature}&humidity=${humidity}`;
 
     try {
         const response = await fetch(url);
@@ -92,6 +92,29 @@ async function getDiseasePrediction(temperature, humidity) {
         return undefined;
     }
 } 
+
+// async function getDiseasePrediction(temperature, humidity) {
+//     try {
+//         const response = await fetch(`https://appsail-50024113720.development.catalystappsail.in/predict?temperature=${temperature}&humidity=${humidity}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             }
+//         });
+
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+
+//         const data = await response.json();
+//         console.log('Prediction:', data);
+//         return data;
+//     } catch (error) {
+//         console.error('Error fetching disease prediction:', error);
+//         throw error;
+//     }
+// }
+
 
 async function updateForeCastInfo(city) {
     const forcastData = await fetchData("forecast", city);

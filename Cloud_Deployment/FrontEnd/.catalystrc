@@ -1,0 +1,30 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "12211000000007077",
+      "name": "AgriSense",
+      "domain": {
+        "id": "50024008444",
+        "name": "agrisense-60035550612.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60035550612",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}
