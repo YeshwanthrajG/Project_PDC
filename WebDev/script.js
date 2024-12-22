@@ -66,6 +66,7 @@ async function updateWeatherInfo(city) {
     weatherSummaryImg.src = `assets/weather/${getWeatherIcon(id)}`;
 
     // Get disease prediction
+    //const risk = await getDiseasePrediction(30,95);
     const risk = await getDiseasePrediction(Math.round(temp), humidity);
     if (risk === 1) {
         alert("Alert: Rice blast is likely to occur. Take preventive measures!");
@@ -90,7 +91,7 @@ async function getDiseasePrediction(temperature, humidity) {
         console.error("Error fetching disease prediction:", error);
         return undefined;
     }
-}
+} 
 
 async function updateForeCastInfo(city) {
     const forcastData = await fetchData("forecast", city);
