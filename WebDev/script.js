@@ -5,13 +5,14 @@ const weatherInfoSection = document.querySelector(".weather-information");
 const searchCitySection = document.querySelector(".search-city");
 const notFoundSection = document.querySelector(".not-found");
 
-const locationFrame = document.querySelector(".location-frame");
+const locationFrame = document.querySelector(".location-text");
 const temperatureFrame = document.querySelector(".temp-frame");
 const conditionFrame = document.querySelector(".conditionframe");
 const humidityFrame = document.querySelector(".humidity-value-frame");
 const windValueFrame = document.querySelector(".wind-value-frame");
+const pressureFrame = document.querySelector(".pressure-value-frame");
 const weatherSummaryImg = document.querySelector(".weather-summary-img");
-const currDateFrame = document.querySelector(".curr-date-frame");
+const currDateFrame = document.querySelector(".curr-date-text");
 
 const forecastItemsFrame = document.querySelector(".forecast-items-frame");
 
@@ -42,6 +43,7 @@ async function fetchData(type, city) {
 
 async function updateWeatherInfo(city) {
     const weatherData = await fetchData("weather", city);
+    console.log(weatherData);
 
     if (weatherData.cod != 200) {
         displaySection(notFoundSection);
@@ -116,6 +118,7 @@ function updateForecastItems(weatherData) {
         weather: [{ id }],
         main: { temp }
     } = weatherData;
+    console.log(weatherData);
 
     const forecastDate = new Date(date);
     const dateOption = {

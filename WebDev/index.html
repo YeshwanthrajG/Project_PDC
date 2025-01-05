@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgriSense</title>
-    <link rel="icon" href="assets/BG/Title-Icon.png"/>
-    <link rel="stylesheet" href="style.css"> <!-- This is to link external css with this html document -->
+    <link rel="stylesheet" href="style.css"> <!-- This is to link external css with tis html document -->
     <script src="script.js" defer></script> <!-- This is to link external js file with this html document -->
 
     <!-- IMPORTING ICONS FROM GOOGLE -->
@@ -16,28 +15,54 @@
 
 <body>
     <main class="home-frame">
-        <header class="input-frame">
+        <div class="input-frame">
             <input class="city-frame" placeholder="Search City/Location" type="text">
             <button class="search-button">
                 <span class="material-symbols-outlined">
                     search
                 </span>
             </button>
-        </header>
+        </div>
 
         <section class="weather-information" style="display: none;">
+        <div class="container">
             <div class="location-and-date-frame">
-                <h4 class="location-frame"></h4>
-                <h5 class="curr-date-frame regular-frame"></h5>
-            </div>
-            <div class="weather-summary-frame">
-                <img class="weather-summary-img">
-                <div class="weather-summary-information">
-                    <h1 class="temp-frame"></h1>
-                    <h3 class="conditionframe regular-frame"></h3>
+                <div class="location-frame">
+                    <span class="location-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z"/></svg>
+                    </span>
+                    <div>
+                        <h4 class="location-text"></h4>
+                    </div>
+                </div>
+                <div class="curr-date-frame">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/></svg>
+                    </span>
+                    <div>
+                        <h5 class="curr-date-text"></h5>
+                    </div>
                 </div>
             </div>
+
+            <div class="weather-summary-frame">
+                <div class="weather-summary-information">
+                    <h3 class="conditionframe regular-frame"></h3>
+                </div>
+                <img class="weather-summary-img">
+            </div>
+
             <div class="weather-conditions-frame">
+                <div class="condition-item">
+                    <span class="material-symbols-outlined">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-520v-80h200v80H520Zm0-160v-80h320v80H520ZM320-120q-83 0-141.5-58.5T120-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T320-120ZM200-320h240q0-29-12.5-54T392-416l-32-24v-280q0-17-11.5-28.5T320-760q-17 0-28.5 11.5T280-720v280l-32 24q-23 17-35.5 42T200-320Z"/></svg>
+                    </span>
+                    <div class="condition-info">
+                        <h5 class="regular-frame">Temperature</h5>
+                        <h5 class="temp-frame"></h5>
+                    </div>
+                </div>
+
                 <div class="condition-item">
                     <span class="material-symbols-outlined">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
@@ -62,6 +87,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <div class="forecast-items-frame">
                 <div class="forecast-item">
