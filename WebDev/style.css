@@ -47,7 +47,7 @@ body::before {
     width: 1000px;
     height: 700px;
     z-index: 1;
-    background: linear-gradient (to top, rgb(0, 0, 0, 0.15),
+    background: linear-gradient(to top, rgb(0, 0, 0, 0.15), 
                 rgb(255, 255, 255, 0.15));
     border-radius: 12px;
     backdrop-filter: blur(100px);
@@ -109,7 +109,7 @@ body::before {
 
 /* Disease prediction frames */
 .disease-prediction {
-    margin-top: 30px;
+    margin-top: 25px;
     display: flex;
     flex-direction: row;
 }
@@ -132,13 +132,25 @@ body::before {
 
 .disease-percentage {
     font-size: 20px;
+    margin-top: 2px;
+}
+
+.disease-text a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 170px;
+}
+
+.link-icon {
+    margin-top: 10px;
+    margin-left: 5px;
 }
 
 /* Weather information frames */
 .container {
     display: flex;
     gap: 20px;
-    margin-top: 10px;
 }
 
 .weather-information {
@@ -166,6 +178,11 @@ body::before {
 .weather-information::-webkit-scrollbar-thumb {
     background: rgb(0, 0, 0, 0.1);
     border-radius: 99px;
+}
+
+#weather-text {
+    font-size: 30px;
+    font-weight: bold;
 }
 
 .location-and-date-frame {
