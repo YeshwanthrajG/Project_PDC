@@ -36,8 +36,13 @@ body::before {
     backdrop-filter: blur(15px);
 }
 
-.logo {
+.tnau-logo {
     position: absolute;
+}
+
+.cit-logo {
+    position: absolute;
+    right: 30px;
 }
 
 /* Main container */
@@ -252,6 +257,10 @@ body::before {
 }
 
 .wind-value-frame{
+    font-size: 18px;
+}
+
+.rainfall-value-frame{
     font-size: 18px;
 }
 

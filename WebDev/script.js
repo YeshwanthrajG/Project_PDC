@@ -11,6 +11,7 @@ const conditionFrame = document.querySelector(".conditionframe");
 const humidityFrame = document.querySelector(".humidity-value-frame");
 const windValueFrame = document.querySelector(".wind-value-frame");
 const pressureFrame = document.querySelector(".pressure-value-frame");
+const rainfallFrame = document.querySelector(".rainfall-value-frame");
 const weatherSummaryImg = document.querySelector(".weather-summary-img");
 const currDateFrame = document.querySelector(".curr-date-text");
 
@@ -19,13 +20,21 @@ const forecastItemsFrame = document.querySelector(".forecast-items-frame");
 const riceBlastPercentage = document.querySelector("#rbp");
 const falseSmutPercentage = document.querySelector("#fsp");
 
+const riceBlastImg = document.querySelector("#rb-img");
+const falseSmutImg = document.querySelector("#fs-img");
+
 const apiKey = "e2a5ffae0db80d6ba420dbed858bea3a";
+
+index = 0;
 
 searchBtn.addEventListener("click", () => {
     if (cityInput.value.trim() != "") {
         updateWeatherInfo(cityInput.value);
         cityInput.value = "";
         cityInput.blur();
+        updateTextColor(index);
+        updatePhoto(index);
+        index = (index + 1) % 5;
     } 
 });
 
@@ -34,8 +43,22 @@ cityInput.addEventListener("keydown", (event) => {
         updateWeatherInfo(cityInput.value);
         cityInput.value = "";
         cityInput.blur();
+        updateTextColor(index);
+        updatePhoto(index);
+        index = (index + 1) % 5;
     }
 });
+
+function updateTextColor(index) {
+    const colors = ["red", "blue", "green", "purple", "black"];
+    riceBlastPercentage.style.color = colors[index];
+    falseSmutPercentage.style.color = colors[index];
+}
+
+function updatePhoto() {
+    riceBlastImg.src = `assets/diseases/rb${index+1}.jpg`;
+    falseSmutImg.src = `assets/diseases/fs${index+1}.jpg`;
+}
 
 async function fetchData(type, city) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/${type}?q=${city}&appid=${apiKey}&units=metric`;
@@ -65,6 +88,7 @@ async function updateWeatherInfo(city) {
     conditionFrame.textContent = main;
     humidityFrame.textContent = humidity + "%";
     windValueFrame.textContent = speed + " M/s";
+    rainfallFrame.textContent = speed + "mm";
 
     currDateFrame.textContent = getCurrentDate();
     
@@ -92,7 +116,7 @@ async function getDiseasePrediction(city) {
         console.log("Latitude:", cords.lat);
         console.log("Longitude:", cords.lon);
 
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${cords.lat}&longitude=${cords.lon}&hourly=relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_sum,wind_speed_10m_max,et0_fao_evapotranspiration&timezone=Asia%2FSingapore&past_days=7&forecast_days=0`;
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${cords.lat}&longitude=${cords.lat}&hourly=relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_sum,et0_fao_evapotranspiration&timezone=Asia%2FSingapore&past_days=7&forecast_days=1`;
 
         const weatherResponse = await fetch(weatherUrl);
 
@@ -184,11 +208,13 @@ async function convertTo2DList(apiResponse) {
 
         const { daily, hourly } = weatherData;
 
+        rainfallFrame.textContent = daily.precipitation_sum[daily.precipitation_sum.length - 1] + " mm";
+
         if (!daily || !hourly) {
             throw new Error("Missing daily or hourly data in the response.");
         }
 
-        const days = daily.time.length;
+        const days = 7;
 
         for (let i = 0; i < days; i++) {
             const maxTemp = daily.temperature_2m_max[i];
