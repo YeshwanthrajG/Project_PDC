@@ -27,6 +27,9 @@ const apiKey = "e2a5ffae0db80d6ba420dbed858bea3a";
 
 index = 0;
 
+const warningBox = document.getElementById('warning-box');
+const warningMessage = document.getElementById('warning-message');
+
 searchBtn.addEventListener("click", () => {
     if (cityInput.value.trim() != "") {
         updateWeatherInfo(cityInput.value);
@@ -116,10 +119,9 @@ async function getDiseasePrediction(city) {
         console.log("Latitude:", cords.lat);
         console.log("Longitude:", cords.lon);
 
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${cords.lat}&longitude=${cords.lat}&hourly=relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_sum,et0_fao_evapotranspiration&timezone=Asia%2FSingapore&past_days=7&forecast_days=1`;
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${cords.lat}&longitude=${cords.lon}&hourly=relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_sum,et0_fao_evapotranspiration&timezone=Asia%2FSingapore&past_days=7&forecast_days=1`;
 
         const weatherResponse = await fetch(weatherUrl);
-
         const weather2DList = await convertTo2DList(weatherResponse);
         console.log("Weather 2D List:", weather2DList);
 
@@ -154,31 +156,208 @@ async function getDiseasePrediction(city) {
             console.log("Sunshine Duration:", sunDur.toFixed(2));
 
             const rbURL = `http://127.0.0.1:8000/predict_rice_blast?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
-                const rbResponse = await fetch(rbURL);
-                const rbData = await rbResponse.json(); 
+            const rbResponse = await fetch(rbURL);
+            const rbData = await rbResponse.json(); 
 
-                if (rbData && rbData.predicted_rice_blast && rbData.predicted_rice_blast[0] !== undefined) {
-                    const predictedRiceBlast = rbData.predicted_rice_blast[0];
-                    console.log(predictedRiceBlast);
-                    riceBlastPercentage.innerHTML = predictedRiceBlast + "%";
-                } else {
-                    console.error("Error: predicted_rice_blast not found in response");
+            if (rbData?.predicted_rice_blast?.[0] !== undefined) {
+                const predictedRiceBlast = rbData.predicted_rice_blast[0];
+                console.log(predictedRiceBlast);
+                riceBlastPercentage.innerHTML = predictedRiceBlast + "%";
+
+                if (predictedRiceBlast > 25) {
+                    showWarning('🚨 Critical Rice Blast Alert!', 'alert');
+                } else if (predictedRiceBlast > 20) {
+                    showWarning('⚠ Moderate Rice Blast Risk', 'warning');
                 }
+            } else {
+                console.error("Error: predicted_rice_blast not found in response");
+            }
 
-                const fsURL = `http://127.0.0.1:8000/predict_false_smut?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
-                const fsResponse = await fetch(fsURL);
-                const fsData = await fsResponse.json(); 
+            const fsURL = `http://127.0.0.1:8000/predict_false_smut?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
+            const fsResponse = await fetch(fsURL);
+            const fsData = await fsResponse.json(); 
 
-                if (fsData && fsData.predicted_false_smut && fsData.predicted_false_smut[0] !== undefined) {
-                    const predictedFalseSmut = fsData.predicted_false_smut[0]; 
-                    console.log(predictedFalseSmut);
-                    falseSmutPercentage.innerHTML = predictedFalseSmut + "%";
-                } else {
-                    console.error("Error: predicted_false_smut not found in response");
+            if (fsData?.predicted_false_smut?.[0] !== undefined) {
+                const predictedFalseSmut = fsData.predicted_false_smut[0]; 
+                console.log(predictedFalseSmut);
+                falseSmutPercentage.innerHTML = predictedFalseSmut + "%";
+
+                if (predictedFalseSmut > 30) {
+                    showWarning('🚨 Critical False Smut Alert!', 'alert');
+                } else if (predictedFalseSmut > 25) {
+                    showWarning('⚠ Moderate False Smut Risk', 'warning');
                 }
+            } else {
+                console.error("Error: predicted_false_smut not found in response");
+            }
         }
     }
 }
+
+// **Updated `showWarning()` function**
+function showWarning(message, type) {
+    // Create a container if it doesn't exist
+    let warningContainer = document.getElementById("warning-container");
+    if (!warningContainer) {
+        warningContainer = document.createElement("div");
+        warningContainer.id = "warning-container";
+        warningContainer.style.position = "fixed";
+        warningContainer.style.top = "10px";
+        warningContainer.style.right = "10px";
+        warningContainer.style.zIndex = "1000";
+        warningContainer.style.display = "flex";
+        warningContainer.style.flexDirection = "column";
+        warningContainer.style.gap = "10px";
+        document.body.appendChild(warningContainer);
+    }
+
+    // Create the warning box
+    const warningBox = document.createElement("div");
+    warningBox.className = `warning-box ${type}`;
+    warningBox.textContent = message;
+    warningBox.style.padding = "10px";
+    warningBox.style.borderRadius = "5px";
+    warningBox.style.color = "#fff";
+    warningBox.style.fontWeight = "bold";
+    warningBox.style.width = "250px";
+    warningBox.style.textAlign = "center";
+
+    // Style for different alert types
+    if (type === "alert") {
+        warningBox.style.backgroundColor = "red";
+    } else if (type === "warning") {
+        warningBox.style.backgroundColor = "orange";
+    }
+
+    // Append the warning box to the container
+    warningContainer.appendChild(warningBox);
+
+    // Remove the warning after 5 seconds
+    setTimeout(() => {
+        warningBox.remove();
+    }, 5000);
+}
+
+// async function getDiseasePrediction(city) {
+//     const cords = await findCords(city);
+
+//     let maxTemp = 0,
+//         minTemp = 0,
+//         relHum = 0,
+//         rainfall = 0,
+//         windSpeed = 0,
+//         evp = 0,
+//         sunDur = 0;
+
+//     if (cords) {
+//         console.log("Latitude:", cords.lat);
+//         console.log("Longitude:", cords.lon);
+
+//         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${cords.lat}&longitude=${cords.lat}&hourly=relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_sum,et0_fao_evapotranspiration&timezone=Asia%2FSingapore&past_days=7&forecast_days=1`;
+
+//         const weatherResponse = await fetch(weatherUrl);
+
+//         const weather2DList = await convertTo2DList(weatherResponse);
+//         console.log("Weather 2D List:", weather2DList);
+
+//         if (weather2DList && weather2DList.length > 0) {
+//             const days = weather2DList.length;
+
+//             weather2DList.forEach(row => {
+//                 maxTemp += row[0];
+//                 minTemp += row[1];
+//                 relHum += row[2];
+//                 rainfall += row[3];
+//                 windSpeed += row[4];
+//                 evp += row[5];
+//                 sunDur += row[6];
+//             });
+
+//             maxTemp /= days;
+//             minTemp /= days;
+//             relHum /= days;
+//             rainfall /= days;
+//             windSpeed /= days;
+//             evp /= days;
+//             sunDur /= days;
+
+//             console.log("Averages for the past 7 days:");
+//             console.log("Max Temperature:", maxTemp.toFixed(2));
+//             console.log("Min Temperature:", minTemp.toFixed(2));
+//             console.log("Relative Humidity:", relHum.toFixed(2));
+//             console.log("Rainfall:", rainfall.toFixed(2));
+//             console.log("Wind Speed:", windSpeed.toFixed(2));
+//             console.log("Evapotranspiration:", evp.toFixed(2));
+//             console.log("Sunshine Duration:", sunDur.toFixed(2));
+
+//             const rbURL = `http://127.0.0.1:8000/predict_rice_blast?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
+//                 const rbResponse = await fetch(rbURL);
+//                 const rbData = await rbResponse.json(); 
+
+//                 if (rbData && rbData.predicted_rice_blast && rbData.predicted_rice_blast[0] !== undefined) {
+//                     const predictedRiceBlast = rbData.predicted_rice_blast[0];
+//                     console.log(predictedRiceBlast);
+//                     riceBlastPercentage.innerHTML = predictedRiceBlast + "%";
+//                 } else {
+//                     console.error("Error: predicted_rice_blast not found in response");
+//                 }
+
+//                 const fsURL = `http://127.0.0.1:8000/predict_false_smut?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
+//                 const fsResponse = await fetch(fsURL);
+//                 const fsData = await fsResponse.json(); 
+
+//                 if (fsData && fsData.predicted_false_smut && fsData.predicted_false_smut[0] !== undefined) {
+//                     const predictedFalseSmut = fsData.predicted_false_smut[0]; 
+//                     console.log(predictedFalseSmut);
+//                     falseSmutPercentage.innerHTML = predictedFalseSmut + "%";
+//                 } else {
+//                     console.error("Error: predicted_false_smut not found in response");
+//                 }
+
+//                 if (rbData?.predicted_rice_blast) {
+//                     const value = rbData.predicted_rice_blast[0];
+//                     riceBlastPercentage.textContent = `${value}%`;
+                    
+//                     if (value > 25) {
+//                         showWarning('🚨 Critical Rice Blast Alert!', 'alert');
+//                     } else if (value > 20) {
+//                         showWarning('⚠ Moderate Rice Blast Risk', 'warning');
+//                     }
+//                 }
+
+//                 if (fsData?.predicted_false_smut) {
+//                     const value = fsData.predicted_false_smut[0];
+//                     falseSmutPercentage.textContent = `${value}%`;
+                    
+//                     if (value > 30) {
+//                         showWarning('🚨 Critical False Smut Alert!', 'alert');
+//                     } else if (value > 25) {
+//                         showWarning('⚠ Moderate False Smut Risk', 'warning');
+//                     }
+//                 }
+//         }
+//     }
+// }
+
+// let warningTimeout; 
+
+// function showWarning(message, type = 'alert') {
+//     clearTimeout(warningTimeout);
+    
+//     warningMessage.textContent = message;
+//     warningBox.className = `warning-box ${type}`;
+    
+//     warningTimeout = setTimeout(() => {
+//         warningBox.classList.add('hidden');
+//     }, 5000);
+// }
+
+function hideWarning() {
+    warningBox.classList.add('hidden');
+}
+
+warningBox.addEventListener('click', hideWarning);
+
 
 async function getCords(city) {
     const url = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${apiKey}`;
