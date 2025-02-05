@@ -97,6 +97,15 @@ body::before {
     border-radius: 12px;
     backdrop-filter: blur(100px);
     padding: 20px;
+    /* text-align: center; */
+}
+
+.project-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px; 
+    color: #333;
+    text-align: center;
 }
 
 /* Resusable utilities class */
@@ -375,4 +384,14 @@ body::before {
 
 p {
     text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
