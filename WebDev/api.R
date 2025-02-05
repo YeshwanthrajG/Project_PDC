@@ -1,55 +1,108 @@
 library(plumber)
+library(forecast)
 
+# Add CORS headers
 #* @filter cors
-cors <- function(req, res) {
+function(req, res) {
   res$setHeader("Access-Control-Allow-Origin", "*")
-  res$setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-  res$setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, ngrok-skip-browser-warning")
+  res$setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+  res$setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+  
+  # Handle preflight OPTIONS requests
   if (req$REQUEST_METHOD == "OPTIONS") {
     res$status <- 200
     return(list())
-  } else {
-    forward()
   }
+  
+  plumber::forward()
 }
 
-# Example endpoint for prediction
-#* @get /predict
-predict_risk <- function(req, res, temperature, humidity) {
-  if (is.null(temperature) || is.null(humidity)) {
-    res$status <- 400
-    return(list(error = "Temperature and humidity are required"))
-  }
-  
-  temperature <- as.numeric(temperature)
-  humidity <- as.numeric(humidity)
-  
-  if (is.na(temperature) || is.na(humidity)) {
-    res$status <- 400
-    return(list(error = "Temperature and humidity must be valid numbers"))
-  }
-  
-  tryCatch({
-    model <- readRDS("ann_model.rds")
-  }, error = function(e) {
-    res$status <- 500
-    return(list(error = paste("Error loading model:", e$message)))
-  })
-  
-  input_data <- data.frame(
-    temperature = temperature,
-    humidity = humidity
+# Load the saved models and scaling parameters
+model_rb <- readRDS("model_rb.rds")
+model_fs <- readRDS("model_fs.rds")
+scale_params_rb <- readRDS("scale_params_rb.rds")
+scale_params_fs <- readRDS("scale_params_fs.rds")
+
+# Helper function to scale input data
+scale_data <- function(data, params) {
+  scaled_data <- sweep(data, 2, params[1, ], FUN = "-")
+  scaled_data <- sweep(scaled_data, 2, params[2, ], FUN = "/")
+  return(scaled_data)
+}
+
+#* @apiTitle ANN Model API for Rice Blast and False Smut Predictions
+
+#* Predict Rice Blast
+#* @param max_temp Maximum Temperature
+#* @param min_temp Minimum Temperature
+#* @param rh_morning Relative Humidity (Morning)
+#* @param rh_evening Relative Humidity (Evening)
+#* @param rainfall Rainfall
+#* @param wind_speed Wind Speed
+#* @param sunshine Sunshine
+#* @param solar_radiation Solar Radiation
+#* @param evaporation Evaporation
+#* @get /predict_rice_blast
+function(max_temp, min_temp, rh_morning, rh_evening, rainfall, wind_speed, sunshine, solar_radiation, evaporation) {
+  # Prepare input data
+  input <- data.frame(
+    MaxTemp = as.numeric(max_temp),
+    MinTemp = as.numeric(min_temp),
+    RH_Morning = as.numeric(rh_morning),
+    RH_Evening = as.numeric(rh_evening),
+    Rainfall = as.numeric(rainfall),
+    WindSpeed = as.numeric(wind_speed),
+    Sunshine = as.numeric(sunshine),
+    SolarRadiation = as.numeric(solar_radiation),
+    Evaporation = as.numeric(evaporation)
   )
   
-  prediction <- compute(model, input_data)
-  risk <- ifelse(prediction$net.result > 0.5, 1, 0)
+  # Scale input data
+  scaled_input <- scale_data(input, scale_params_rb)
   
-  res$setHeader("Content-Type", "application/json")
-  return(list(rice_blast = risk))
+  # Predict using the model
+  prediction <- forecast(model_rb, xreg = as.matrix(scaled_input), h = 1)$mean * 100
+  
+  # Return prediction
+  list(predicted_rice_blast = prediction)
 }
 
-# Initialize the API
-pr <- Plumber$new()
-pr$filter("cors", cors)
-pr$handle("GET", "/predict", predict_risk)
-pr$run(port = 8000)
+#* Predict False Smut
+#* @param max_temp Maximum Temperature
+#* @param min_temp Minimum Temperature
+#* @param rh_morning Relative Humidity (Morning)
+#* @param rh_evening Relative Humidity (Evening)
+#* @param rainfall Rainfall
+#* @param wind_speed Wind Speed
+#* @param sunshine Sunshine
+#* @param solar_radiation Solar Radiation
+#* @param evaporation Evaporation
+#* @get /predict_false_smut
+function(max_temp, min_temp, rh_morning, rh_evening, rainfall, wind_speed, sunshine, solar_radiation, evaporation) {
+  # Prepare input data
+  input <- data.frame(
+    MaxTemp = as.numeric(max_temp),
+    MinTemp = as.numeric(min_temp),
+    RH_Morning = as.numeric(rh_morning),
+    RH_Evening = as.numeric(rh_evening),
+    Rainfall = as.numeric(rainfall),
+    WindSpeed = as.numeric(wind_speed),
+    Sunshine = as.numeric(sunshine),
+    SolarRadiation = as.numeric(solar_radiation),
+    Evaporation = as.numeric(evaporation)
+  )
+  
+  # Scale input data
+  scaled_input <- scale_data(input, scale_params_fs)
+  
+  # Predict using the model
+  prediction <- forecast(model_fs, xreg = as.matrix(scaled_input), h = 1)$mean * 100
+  
+  # Return prediction
+  list(predicted_false_smut = prediction)
+}
+
+# Code to start the api in port 8000
+# library(plumber)
+# pr <- plumb("test_api.R")
+# pr$run(port = 8000)
