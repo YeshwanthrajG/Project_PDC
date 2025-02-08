@@ -40,7 +40,7 @@ body::before {
     position: absolute;
     text-align: center;
     color: #333;
-    top: 20px;
+    top: 70px;
     left: 40px;
 }
 
@@ -48,7 +48,7 @@ body::before {
     position: absolute;
     text-align: center;
     color: #000;
-    top: 20px;
+    top: 70px;
     right: 40px;
 }
 
@@ -101,7 +101,7 @@ body::before {
 .home-frame {
     border: solid;
     width: 1000px;
-    height: 720px;
+    height: 770px;
     z-index: 1;
     background: linear-gradient(to top, rgb(0, 0, 0, 0.15), 
                 rgb(255, 255, 255, 0.15));
@@ -175,7 +175,7 @@ body::before {
 /* Disease prediction frames */
 
 .disease-prediction {
-    margin-top: 25px;
+    margin-top: 10px;
     display: flex;
     flex-direction: row;
 }
@@ -223,6 +223,7 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 25px;
+    margin-top: 10px;
     overflow-y: auto;
     max-height: 550px;
     padding: 15px; 

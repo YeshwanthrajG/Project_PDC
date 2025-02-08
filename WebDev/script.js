@@ -93,9 +93,10 @@ async function updateWeatherInfo(city) {
     weatherSummaryImg.src = `assets/weather/${getWeatherIcon(id)}`;
 
     await updateForeCastInfo(city);
-    await getDiseasePrediction(city);
-
+    
     displaySection(weatherInfoSection);
+    
+    await getDiseasePrediction(city);
 }
 
 async function getDiseasePrediction(city) {
