@@ -159,9 +159,10 @@ async function getDiseasePrediction(city) {
                 riceBlastPercentage.innerHTML = predictedRiceBlast + "%";
 
                 if (predictedRiceBlast > 30) {
-                    showWarning('⚠ Critical Rice Blast Alert!', 'alert');
+                    // showWarning('⚠ Critical Rice Blast Alert!', 'alert');
+                    showWarning(' ⚠ Warning: Disease Incidence Index Rice Blast Exceeds Threshold! Current Index: '+predictedRiceBlast+"%"+'. Immediate action is recommended to prevent further spread.','alert');
                 } else if (predictedRiceBlast > 25) {
-                    showWarning('⚠ Moderate Rice Blast Risk', 'warning');
+                    showWarning('⚠ Alert: Moderate Rice Blast Risk Found. Take preventive measures', 'warning');
                 }
             } else {
                 console.error("Error: predicted_rice_blast not found in response");
@@ -178,9 +179,12 @@ async function getDiseasePrediction(city) {
                 falseSmutPercentage.innerHTML = predictedFalseSmut + "%";
 
                 if (predictedFalseSmut > 30) {
-                    showWarning('⚠ Critical False Smut Alert!', 'alert');
+                    // showWarning('⚠ Critical False Smut Alert!', 'alert');
+                    // showWarning(' ⚠ Severe False Smut Alert! Take preventive measures!','alert')
+                    showWarning(' ⚠ Warning: Disease Incidence Index False Smut Exceeds Threshold! Current Index: '+predictedFalseSmut+"%"+'. Immediate action is recommended to prevent further spread.','alert')
                 } else if (predictedFalseSmut > 25) {
-                    showWarning('⚠ Moderate False Smut Risk', 'warning');
+                    // showWarning('⚠ Moderate False Smut Risk', 'warning');
+                    showWarning('⚠ Alert: Moderate False Smut Risk Found. Take preventive measures', 'warning');
                 }
             } else {
                 console.error("Error: predicted_false_smut not found in response");
@@ -351,7 +355,7 @@ function showWarning(message, type) {
         color: "#fff",
         fontSize: "20px",
         fontWeight: "bold",
-        width: "400px",
+        width: "500px",
         textAlign: "center",
         backgroundColor: type === "alert" ? "red" : "orange",
         transition: "opacity 0.5s ease, transform 0.5s ease",
