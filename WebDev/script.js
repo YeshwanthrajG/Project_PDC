@@ -27,9 +27,12 @@ const apiKey = "e2a5ffae0db80d6ba420dbed858bea3a";
 
 let index = 0;
 
+const week = 49;
+
 searchBtn.addEventListener("click", () => {
     if (cityInput.value.trim() !== "") {
         updateWeatherInfo(cityInput.value);
+        // updatePastWeather(cityInput.value, week);
         cityInput.value = "";
         cityInput.blur();
         updateTextColor(index);
@@ -41,6 +44,7 @@ searchBtn.addEventListener("click", () => {
 cityInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && cityInput.value.trim() !== "") {
         updateWeatherInfo(cityInput.value);
+        // updatePastWeather(cityInput.value, week);
         cityInput.value = "";
         cityInput.blur();
         updateTextColor(index);
@@ -58,6 +62,162 @@ function updateTextColor(idx) {
 function updatePhoto(idx) {
     riceBlastImg.src = `assets/diseases/rb${idx+1}.jpg`;
     falseSmutImg.src = `assets/diseases/fs${idx+1}.jpg`;
+}
+
+async function updatePastWeather(city, week) {
+    if (city != 'coimbatore' && city != 'aduthurai' && city != 'ambasamudram') {
+        displaySection(notFoundSection);
+        return
+    }
+
+    locationFrame.textContent = city.charAt(0).toUpperCase() + city.slice(1);
+    currDateFrame.textContent = getDate(week);
+
+    data = await getWeatherData(city, week);
+    console.log(data);
+
+    const { maxTemp, minTemp, relHum, rainfall, windSpeed, evp, sunDur } = data[0];
+
+    console.log("Max Temp:", maxTemp);
+    console.log("Min Temp:", minTemp);
+    console.log("Relative Humidity:", relHum);
+    console.log("Rainfall:", rainfall);
+    console.log("Wind Speed:", windSpeed);
+    console.log("Evaporation:", evp);
+    console.log("Sunshine Duration:", sunDur);
+
+    temperatureFrame.textContent = Math.round((maxTemp+minTemp)/2) + "℃";
+    humidityFrame.textContent = Math.round(relHum) + "%";
+    windValueFrame.textContent = Math.round(windSpeed) + " M/s";
+    rainfallFrame.textContent = (rainfall).toFixed(2) + "mm";
+
+    if ((maxTemp+minTemp)/2 > 24)
+        weatherSummaryImg.src = `assets/weather/clear.png`;
+    else
+    weatherSummaryImg.src = `assets/weather/clouds.png`;
+
+    displaySection(weatherInfoSection);
+
+    await getPastDiseasePrediction(maxTemp, minTemp, relHum, relHum, rainfall, windSpeed, sunDur, evp);
+}
+
+async function getPastDiseasePrediction(maxTemp, minTemp, relHum, relHum, rainfall, windSpeed, sunDur, evp) {
+    // Rice Blast Prediction
+    const rbURL = `http://127.0.0.1:8000/predict_rice_blast?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
+    const rbResponse = await fetch(rbURL);
+    const rbData = await rbResponse.json(); 
+
+    if (rbData?.predicted_rice_blast?.[0] !== undefined) {
+        const predictedRiceBlast = rbData.predicted_rice_blast[0];
+        console.log(predictedRiceBlast);
+        riceBlastPercentage.innerHTML = predictedRiceBlast + "%";
+
+        if (predictedRiceBlast > 25) {
+            // showWarning('⚠ Critical Rice Blast Alert!', 'alert');
+            showWarning(' ⚠ Warning: Rice Blast incidence exceeds threshold. Immediate action is recommended to prevent further spread','alert');
+        } else if (predictedRiceBlast > 20) {
+            // showWarning('⚠ Moderate Rice Blast Risk', 'warning');
+            showWarning('⚠ Alert: Moderate Rice Blast Risk Found. Take preventive measures', 'warning');
+        }
+    } else {
+        console.error("Error: predicted_rice_blast not found in response");
+    }
+
+    // False Smut Prediction
+    const fsURL = `http://127.0.0.1:8000/predict_false_smut?max_temp=${maxTemp}&min_temp=${minTemp}&rh_morning=${relHum}&rh_evening=${relHum}&rainfall=${rainfall}&wind_speed=${windSpeed}&sunshine=${sunDur}&solar_radiation=300&evaporation=${evp}`;
+    const fsResponse = await fetch(fsURL);
+    const fsData = await fsResponse.json(); 
+
+    if (fsData?.predicted_false_smut?.[0] !== undefined) {
+        const predictedFalseSmut = fsData.predicted_false_smut[0]; 
+        console.log(predictedFalseSmut);
+        falseSmutPercentage.innerHTML = predictedFalseSmut + "%";
+
+        if (predictedFalseSmut > 25) {
+            // showWarning('⚠ Critical False Smut Alert!', 'alert');
+            showWarning(' ⚠ Warning: False Smut incidence exceeds threshold. Immediate action is recommended to prevent further spread', 'alert')
+        } else if (predictedFalseSmut > 20) {
+            // showWarning('⚠ Moderate False Smut Risk', 'warning');
+            showWarning('⚠ Alert: Moderate False Smut Risk Found. Take preventive measures', 'warning');
+        }
+    } else {
+        console.error("Error: predicted_false_smut not found in response");
+    }
+}
+
+async function getWeatherData(location, week) {
+    const sheetMapping = {
+        coimbatore: "Coimbatore",
+        aduthurai: "ADUTHURAI",
+        ambasamudram: "Ambasamudram"
+    };
+
+    const columnMapping = {
+        coimbatore: { maxTemp: "MaxT", minTemp: "MinT", relHum1: "RHm", relHum2: "Rhe", rainfall: "RF", windSpeed: "WS", evp: "EVP", sunDur: "SS" },
+        aduthurai: { maxTemp: "MaxT", minTemp: "MinT", relHum1: "RHm", relHum2: "Rhe", rainfall: "Rainfall", windSpeed: "WV", evp: "EVP", sunDur: "SS" },
+        ambasamudram: { maxTemp: "MaxT", minTemp: "MinT", relHum1: "RHm", relHum2: "Rhe", rainfall: "RF", windSpeed: "WS", evp: "SR", sunDur: "ST" } // "ST" instead of "SS"
+    };
+
+    const sheetName = sheetMapping[location.toLowerCase()];
+    if (!sheetName) {
+        throw new Error("Invalid location. Choose from 'coimbatore', 'aduthurai', or 'ambasamudram'.");
+    }
+
+    const response = await fetch("assets/data/OCT TO DEC 2024.xlsx");
+    const arrayBuffer = await response.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+    const sheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+    const columns = columnMapping[location.toLowerCase()];
+
+    const filteredData = jsonData
+        .filter(row => row.SMW === week) 
+        .map(row => ({
+            maxTemp: row[columns.maxTemp],
+            minTemp: row[columns.minTemp],
+            relHum: (row[columns.relHum1] + row[columns.relHum2]) / 2, 
+            rainfall: row[columns.rainfall],
+            windSpeed: row[columns.windSpeed],
+            evp: row[columns.evp],
+            sunDur: row[columns.sunDur] 
+        }));
+
+    return filteredData;
+}
+
+function getDate(week) {
+    if (week == 42) {
+        lb = 15, ub = 21;
+        month = 10;
+    } else if (week == 43) {
+        lb = 22, ub = 28;
+        month = 10;
+    } else if (week == 44) {
+        lb = 1, ub = 4;
+        month = 11;
+    } else if (week == 45) {
+        lb = 5, ub = 11;
+        month = 11;
+    } else if (week == 46) {
+        lb = 12, ub = 19;
+        month = 11;
+    } else if (week == 47) {
+        lb = 20, ub = 31;
+        month = 11;
+    } else {
+        lb = 1, ub = 2;
+        month = 12;
+    }
+
+    const date = new Date(2024, month - 1, getDay(lb,ub));
+    const options = { weekday: "short", day: "2-digit", month: "short" };
+    return date.toLocaleDateString("en-GB", options);
+}
+
+function getDay(lower, upper) {
+    return Math.floor(Math.random() * (upper - lower + 1)) + lower;
 }
 
 async function fetchData(type, city) {
@@ -161,8 +321,9 @@ async function getDiseasePrediction(city) {
 
                 if (predictedRiceBlast > 30) {
                     // showWarning('⚠ Critical Rice Blast Alert!', 'alert');
-                    showWarning(' ⚠ Warning: Disease Incidence Index Rice Blast Exceeds Threshold! Current Index: '+predictedRiceBlast+"%"+'. Immediate action is recommended to prevent further spread.','alert');
+                    showWarning('⚠ Warning: Rice Blast incidence exceeds threshold. Immediate action is recommended to prevent further spread', 'alert');
                 } else if (predictedRiceBlast > 25) {
+                    // showWarning('⚠ Moderate Rice Blast Risk', 'warning');
                     showWarning('⚠ Alert: Moderate Rice Blast Risk Found. Take preventive measures', 'warning');
                 }
             } else {
@@ -181,8 +342,7 @@ async function getDiseasePrediction(city) {
 
                 if (predictedFalseSmut > 30) {
                     // showWarning('⚠ Critical False Smut Alert!', 'alert');
-                    // showWarning(' ⚠ Severe False Smut Alert! Take preventive measures!','alert')
-                    showWarning(' ⚠ Warning: Disease Incidence Index False Smut Exceeds Threshold! Current Index: '+predictedFalseSmut+"%"+'. Immediate action is recommended to prevent further spread.','alert')
+                    showWarning('⚠ Warning: False Smut incidence exceeds threshold. Immediate action is recommended to prevent further spread', 'alert')
                 } else if (predictedFalseSmut > 25) {
                     // showWarning('⚠ Moderate False Smut Risk', 'warning');
                     showWarning('⚠ Alert: Moderate False Smut Risk Found. Take preventive measures', 'warning');
