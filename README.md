@@ -6,7 +6,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R](https://img.shields.io/badge/R-Plumber%20API-276DC3?logo=r)](https://www.r-project.org/)
-[![Python](https://img.shields.io/badge/Python-FastAPI-3776AB?logo=python)](https://fastapi.tiangolo.com/)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen)]()
 
 > A web-based intelligent prediction platform that helps farmers and agricultural stakeholders detect the risk of rice diseases - **Blast** (*Magnaporthe oryzae*) and **False Smut** (*Ustilaginoidea virens*) - using real-time weather data and an AI-driven Artificial Neural Network (ANN) model.
@@ -76,18 +75,12 @@ The system follows a **three-tier architecture**:
                         │ REST API Calls
 ┌───────────────────────▼────────────────────────────┐
 │             APPLICATION LAYER                      │
-│   FastAPI (Python) + R Plumber API                 │
+│                  R Plumber API                     │
 │   ┌─────────────────────────────────────────┐      │
 │   │  Data Ingestion → Preprocessing → ANN   │      │
 │   │  Model → Alert Logic → Notification     │      │
 │   └─────────────────────────────────────────┘      │
 │             OpenWeather API (External)             │
-└───────────────────────┬────────────────────────────┘
-                        │
-┌───────────────────────▼────────────────────────────┐
-│                  DATA LAYER                        │
-│          SQLite / PostgreSQL Database              │
-│  (Historical Data · Processed Features · Results)  │
 └────────────────────────────────────────────────────┘
 ```
 
@@ -105,7 +98,6 @@ The system follows a **three-tier architecture**:
 ### Backend
 | Technology | Purpose |
 |------------|---------|
-| Python (FastAPI) | REST API server, routing, session management |
 | R Programming | ANN model training & prediction logic |
 | Plumber (R Package) | Exposes trained R model as REST API |
 
@@ -123,6 +115,7 @@ The system follows a **three-tier architecture**:
 | VS Code | Frontend and backend development |
 | Git | Version control |
 | Plumber | R REST API wrapper |
+| Zoho Catalyst | Deployment |
 
 ---
 
@@ -145,19 +138,10 @@ The system follows a **three-tier architecture**:
 
 Ensure you have the following installed on your machine:
 
-- **Python** 3.9+
 - **R** 4.0+
 - **Node.js** (optional, for frontend tooling)
 - **Git**
-
-Required Python packages:
-```
-fastapi
-uvicorn
-psycopg2
-jinja2
-python-multipart
-```
+- **Catalyst CLI**
 
 Required R packages:
 ```r
@@ -174,14 +158,7 @@ git clone https://github.com/YeshwanthrajG/Project_PDC.git
 cd Project_PDC
 ```
 
-**2. Set up the Python environment**
-```bash
-python -m venv venv
-source venv/bin/activate        # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-**3. Configure the OpenWeather API key**
+**2. Configure the OpenWeather API key**
 
 Create a `.env` file in the project root:
 ```env
@@ -189,7 +166,7 @@ OPENWEATHER_API_KEY=your_api_key_here
 ```
 Get your free API key at [openweathermap.org](https://openweathermap.org/api).
 
-**4. Set up and run the R Prediction API**
+**3. Set up and run the R Prediction API**
 ```r
 # In RStudio or R terminal
 setwd("path/to/Project_PDC/r_model")
@@ -197,22 +174,6 @@ source("train_model.R")       # Train the ANN model
 library(plumber)
 pr("predict_api.R") %>% pr_run(port = 8001)
 ```
-
----
-
-### Running the Application
-
-**Start the FastAPI backend:**
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-**Access the dashboard:**
-```
-http://localhost:8000
-```
-
-The application will be live at `http://localhost:8000`. The R Prediction API runs on port `8001` and is consumed internally by the backend.
 
 ---
 
