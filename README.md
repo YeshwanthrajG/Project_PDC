@@ -253,12 +253,12 @@ The application will be live at `http://localhost:8000`. The R Prediction API ru
 
 ---
 
-## 👤 Author
+## 👤 Authors
 
-**Dhinesh Kumar S**
+**Dhinesh Kumar S** \
 [Github: @DhineshKumarS](https://github.com/Dhinesh1510)
 
-**Dhinesh Raj. A**
+**Dhinesh Raj. A** \
 [Github: @DhineshrajA](https://github.com/DHINESHRAJ007)
 
 **Yeshwanthraj G**  
