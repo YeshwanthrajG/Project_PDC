@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌾 Rice Disease Prediction System
+# 🌾 Real-Time Weather Based Rice Disease Prediction System
 
 ### AI-Powered Early Warning Platform for Rice Blast & False Smut
 
